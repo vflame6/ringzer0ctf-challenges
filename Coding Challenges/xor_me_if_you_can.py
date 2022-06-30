@@ -10,13 +10,13 @@ def main():
     r = requests.get(url)
     r = BeautifulSoup(r.text, 'html.parser')
     data = r.findAll('div', class_='message')
-    key_pool, encoded_message = (msg.text.split()[5] for msg in data)
+    key_pool, encoded_message = (msg.text.split()[5].encode() for msg in data)
     key_length = 10
 
-    message = base64.b64decode(encoded_message.encode())
+    message = base64.b64decode(encoded_message)
 
     for i in range(len(key_pool) - key_length):
-        key = key_pool[i:i+key_length].encode()
+        key = key_pool[i:i+key_length]
         res = ''
 
         for index, char in enumerate(message):
