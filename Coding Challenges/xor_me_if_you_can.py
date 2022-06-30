@@ -17,10 +17,12 @@ def main():
 
     for i in range(len(key_pool) - key_length):
         key = key_pool[i:i+key_length]
-        res = ''
+        res = list()
 
         for index, char in enumerate(message):
-            res += chr(char ^ key[index % key_length])
+            res.append(chr(char ^ key[index % key_length]))
+
+        res = ''.join(res)
 
         if res.isalnum():
             answer = res
