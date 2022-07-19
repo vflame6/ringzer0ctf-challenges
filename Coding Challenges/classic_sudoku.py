@@ -1,9 +1,20 @@
+import os
+import pty
 from sudoku import Sudoku
 
 HOST = 'challenges.ringzer0team.com'
 PORT = '10143'
 USER = "sudoku"
 PASS = "dg43zz6R0E"
+ssh_command = [
+    "/usr/bin/sshpass",
+    "-p",
+    PASS,
+    "ssh",
+    "-p",
+    PORT,
+    f"{USER}@{HOST}",
+]
 
 def parse_sudoku(plain_text):
     result = []
@@ -22,17 +33,32 @@ def parse_sudoku(plain_text):
     return result
 
 def main():
-    board = ""
-    board = parse_sudoku(board)
+    pid, child_fd = pty.fork()
+
+    if not pid:
+        os.execv(ssh_command[0], ssh_command)
+
+    # Skip pty message
+    output = os.read(child_fd, 1024)
+
+    raw_challenge = os.read(child_fd, 1024).decode()
+    challenge = "\n".join(raw_challenge.split("\n")[3:22])
+
+    board = parse_sudoku(challenge)
     puzzle = Sudoku(3, 3, board=board)
     solution = puzzle.solve().board
     answer = []
     for line in solution:
         line_ = map(str, line)
         answer.append(",".join(line_))
-    answer = ",".join(answer)    
+    answer = ",".join(answer) + "\n"   
 
-    print(answer)
+    os.write(child_fd, answer.encode())
+    # Skip our written answer
+    os.read(child_fd, 1024)
+
+    flag = os.read(child_fd, 1024).decode()
+    print(flag)
 
 
 
