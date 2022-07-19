@@ -6,6 +6,7 @@ HOST = 'challenges.ringzer0team.com'
 PORT = '10143'
 USER = "sudoku"
 PASS = "dg43zz6R0E"
+
 ssh_command = [
     "/usr/bin/sshpass",
     "-p",
@@ -15,6 +16,7 @@ ssh_command = [
     PORT,
     f"{USER}@{HOST}",
 ]
+
 
 def parse_sudoku(plain_text):
     result = []
@@ -32,6 +34,7 @@ def parse_sudoku(plain_text):
         result.append(res_line)
     return result
 
+
 def main():
     pid, child_fd = pty.fork()
 
@@ -42,7 +45,9 @@ def main():
     output = os.read(child_fd, 1024)
 
     raw_challenge = os.read(child_fd, 1024).decode()
-    challenge = "\n".join(raw_challenge.split("\n")[3:22])
+    raw_challenge = raw_challenge.split("\n")
+
+    challenge = "\n".join(raw_challenge[3:22])
 
     board = parse_sudoku(challenge)
     puzzle = Sudoku(3, 3, board=board)
@@ -51,7 +56,7 @@ def main():
     for line in solution:
         line_ = map(str, line)
         answer.append(",".join(line_))
-    answer = ",".join(answer) + "\n"   
+    answer = ",".join(answer) + "\n"
 
     os.write(child_fd, answer.encode())
     # Skip our written answer
@@ -59,7 +64,6 @@ def main():
 
     flag = os.read(child_fd, 1024).decode()
     print(flag)
-
 
 
 if __name__ == "__main__":
