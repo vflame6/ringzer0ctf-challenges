@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import pwn
+from pwn import *
 
 HOST = "challenges.ringzer0team.com"
 PORT = 10130
@@ -8,12 +8,11 @@ USER = "number"
 PASS = "Z7IwIMRC2dc764L"
 
 def main():
-    s = pwn.ssh(user=USER, host=HOST, port=PORT, password=PASS)
-    shell = s.shell()
-
-    shell.interactive()
-
+    # idk this is not working for me, googled for a solution and nothing, the script just  after connection
+    s = ssh(USER, HOST, PORT, PASS)
+    
 
 
+    
 if __name__ == "__main__":
     main()
